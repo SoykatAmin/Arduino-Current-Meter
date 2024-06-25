@@ -1,5 +1,5 @@
 #pragma once
-#include <avr/io.h>
+#include <stdint.h>
 
 // Buffer sizes for statistics
 const uint8_t hour_stats = 60;
