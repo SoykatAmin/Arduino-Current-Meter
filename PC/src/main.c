@@ -1,11 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "../include/stats.h"
-
-#define SERIAL_PORT "/dev/ttyUSB0"
-#define BAUD_RATE B19600
+#include "../include/utils.h"
 
 int main(){
+    int serial_port = init_serial(SERIAL_PORT);
 
     while (1) {
         printf("Enter command (o=online, c=clear, q=query): ");
@@ -13,7 +12,7 @@ int main(){
         fgets(cmd, sizeof(cmd), stdin);
         switch (cmd[0]) {
             case 'o':
-                // Set to online mode
+                set_online_mode(serial_port, 1);
                 break;
             case 'c':
                 clear_statistics();
