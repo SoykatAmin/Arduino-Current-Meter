@@ -16,5 +16,5 @@ volatile uint16_t sampleCount = 0;
 // prototypes
 
 void store_sample(void);
-uint16_t read_current(void);
+uint16_t read_adc(uint8_t pin);
 float get_rms_current(void);
