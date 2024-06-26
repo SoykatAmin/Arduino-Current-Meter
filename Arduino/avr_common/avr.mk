@@ -15,7 +15,7 @@ $(INCLUDE_DIRS)\
 -DF_CPU=16000000UL\
 
 TARGET=mega
-AVRDUDE_PORT=/dev/ttyACM0
+AVRDUDE_PORT=/dev/ttyUSB0
 
 ifeq ($(TARGET), mega)
 	CC_OPTS_GLOBAL += -mmcu=atmega2560 -D__AVR_3_BYTE_PC__
@@ -37,7 +37,7 @@ AS_OPTS=-x assembler-with-cpp $(CC_OPTS)
 
 AVRDUDE_WRITE_FLASH = -U flash:w:$(TARGET):i
 AVRDUDE_FLAGS += -P $(AVRDUDE_PORT) -b $(AVRDUDE_BAUDRATE)
-AVRDUDE_FLAGS += -D -q -V -C /usr/share/arduino/hardware/tools/avr/../avrdude.conf
+AVRDUDE_FLAGS += -D -q -V -C /etc/avrdude.conf
 AVRDUDE_FLAGS += -c $(AVRDUDE_BOOTLOADER)
 
 

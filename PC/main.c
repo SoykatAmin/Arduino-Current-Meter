@@ -4,7 +4,7 @@
 #include "stats.h"
 
 #define SERIAL_PORT "/dev/ttyUSB0"
-#define BAUD_RATE B19200
+#define BAUD_RATE B19600
 
 int main(){
 
