@@ -1,7 +1,6 @@
-#pragma once
 #include <stdio.h>
 #include <stdlib.h>
-#include "stats.h"
+#include "../include/stats.h"
 
 #define SERIAL_PORT "/dev/ttyUSB0"
 #define BAUD_RATE B19600
