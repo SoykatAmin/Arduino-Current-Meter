@@ -38,7 +38,7 @@ void timer2_init(void) {
     // Set CTC mode (Clear Timer on Compare Match)
     TCCR2A |= (1 << WGM21);
     // Set compare value for 1 Hz interrupt (assuming 16 MHz clock and 1024 prescaler)
-    OCR2A = 1562;
+    OCR2A = 249;
     // Enable Timer2 compare interrupt
     TIMSK2 |= (1 << OCIE2A);
     // Start Timer2 with 1024 prescaler
@@ -48,23 +48,11 @@ void timer2_init(void) {
 ISR(TIMER1_COMPA_vect) {
     // Calculate RMS current value
     float rms_current = get_rms();
-    // Transmit current reading
-    char buffer[20];
-    sprintf(buffer, "%.2f", rms_current*CALIBRATION_CONST);
-    UART_putString("Current reading: ");
-    UART_putString(buffer);
+    
 }
 
 ISR(TIMER2_COMPA_vect) {
     // Read ADC value
     uint16_t adc_value = read_adc();
-    unsigned char buffer[20];
-    uint16_t actual_value = adc_value - 465;
-    float voltage = adc_value * 5.0 / 1024.0;
-    sumOfSquares += voltage * voltage;
-    itoa(actual_value, buffer, 10);
-    UART_putString("adc Value: ");
-    UART_putString(buffer);
-    UART_putString("\n");
-    sampleCount++;
+    update_sample(adc_value);
 }

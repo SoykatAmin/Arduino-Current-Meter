@@ -10,6 +10,15 @@
 
 volatile long sumOfSquares = 0;
 volatile int sampleCount = 0;
+uint16_t maxValue = 0;
+uint16_t minValue = 1024;
+int count_small_range = 0;
+int count_large_range = 0;
+float average_voltage = 0.0;
+float sumVoltage = 0.0;
+float average_voltage_large_range = 0.0;
+float sumVoltageLargeRange = 0.0;
+
 
 /**
  * Initializes the ADC (Analog-to-Digital Converter) module.
@@ -44,18 +53,66 @@ uint16_t read_adc(){
     return adcValue;
 }
 
-// Calculates the root mean square (RMS) tension value.
-// Resets the sum of squares and sample count variables.
-// Returns the RMS tension value.
+/**
+ * Calculates and returns the voltage based on the maximum value obtained from the analog input.
+ * 
+ * @return The calculated voltage.
+ */
+float get_volt(void){
+    float result = (maxValue * 5.0) / 1024.0;
+    UART_putString("Difference: ");
+    char buffer2[20];
+    dtostrf(maxValue - minValue, 0, 5, buffer2);
+    UART_putString(buffer2);
+    UART_putString("\n");
+    if (maxValue - minValue < 30) {
+        sumVoltage += result;
+        count_small_range++;
+        average_voltage = sumVoltage / count_small_range;
+    } else {
+        sumVoltageLargeRange += result;
+        count_large_range++;
+        average_voltage_large_range = sumVoltageLargeRange / count_large_range;
+    }
+    UART_putString("Voltage: ");
+    char buffer[20];
+    dtostrf(result, 0, 5, buffer);
+    UART_putString(buffer);
+    UART_putString(" V\n");
+    UART_putString("Average voltage while not charging: ");
+    dtostrf(average_voltage, 0, 5, buffer);
+    UART_putString(buffer);
+    UART_putString(" V\n");
+    UART_putString("Average voltage while charging: ");
+    dtostrf(average_voltage_large_range, 0, 5, buffer);
+    UART_putString(buffer);
+    UART_putString(" V\n");
+
+    maxValue = 0; 
+    minValue = 1024;
+
+    return result;
+}
+
 float get_rms(void){
-    float meanSquare = sumOfSquares / (float)sampleCount;
-    sumOfSquares = 0;
-    sampleCount = 0;
-    return sqrt(meanSquare);
+    float VPP = get_volt();
+    float CurrPP = (VPP/200)*1000.0;
+    float rms = CurrPP / sqrt(2);
+    float currWire = rms;
+    return currWire;
 }
 
 void transmit_current_reading(uint16_t current_reading) {
     char buffer[5];
-    sprintf(buffer, "%04X", current_reading);
+    itoa(current_reading, buffer, 10);
     UART_putString((uint8_t*)buffer);
+}
+
+void update_sample(uint16_t sample){
+    if (sample > maxValue) {
+        maxValue = sample;
+    }
+    if (sample < minValue) {
+        minValue = sample;
+    }
 }

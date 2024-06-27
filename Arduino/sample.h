@@ -1,5 +1,6 @@
 #include <stdint.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <avr/io.h>
 #include "./my_uart/my_uart.h"
 #include <stdint.h>
@@ -25,10 +26,13 @@
 
 extern volatile long sumOfSquares;
 extern volatile int sampleCount;
+extern uint16_t maxValue;
 
 // prototypes
 
 void init_adc(void);
 uint16_t read_adc();
+float get_volt(void);
 float get_rms(void);
 void transmit_current_reading(uint16_t current_reading);
+void update_sample(uint16_t sample);
