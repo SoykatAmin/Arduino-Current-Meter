@@ -10,7 +10,6 @@ int main(void) {
             sample_flag = 0;
             current_reading++;
             transmit_current_reading(current_reading);
-            UART_putString("\n");
         }
         _delay_ms(1000);
     }

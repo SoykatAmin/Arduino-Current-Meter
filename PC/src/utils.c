@@ -1,12 +1,14 @@
 #include "../include/utils.h"
 
+int online_mode = 0;
+
 void error_exit(const char *message) {
     perror(message);
     exit(EXIT_FAILURE);
 }
 
 int init_serial(const char *port_name){
-    int serial_port = open(port_name, O_RDWR | O_NOCTTY | O_NDELAY);
+    int serial_port = open(port_name, O_RDWR);
     if (serial_port == -1) {
         error_exit("Error opening the serial port");
     }
@@ -46,19 +48,24 @@ int init_serial(const char *port_name){
     return serial_port;
 }
 
-void close_serial(int serial_port){
-    close(serial_port);
-}
-
-void set_online_mode(int serial_port, int interval) {
-    char command = 'o';
-    write(serial_port, command, 1);
+void set_online_mode(int serial_port) {
+    const char command = 'o';
+    online_mode = 1;
+    write(serial_port, &command, 1);
 }
 
 void set_offline_mode(int serial_port) {
-    char command = 'f';
-    write(serial_port, command, 1);
+    const char command = 'f';
+    online_mode = 0;
+    write(serial_port, &command, 1);
 }
 
+void serial_read(int serial_port, char *buffer, int buffer_size){
+    int bytes_read = read(serial_port, buffer, buffer_size);
+    if (bytes_read < 0) {
+        error_exit("Error reading from serial port");
+    }
+    buffer[bytes_read] = 0;
+}
 
 
