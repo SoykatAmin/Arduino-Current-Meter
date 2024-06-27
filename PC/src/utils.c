@@ -13,6 +13,7 @@ int init_serial(const char *port_name){
         error_exit("Error opening the serial port");
     }
     struct termios tty;
+    memset (&tty, 0, sizeof tty);
     if (tcgetattr(serial_port, &tty) != 0) {
         error_exit("Error getting the serial port attributes");
     }
@@ -44,6 +45,10 @@ int init_serial(const char *port_name){
     if (tcsetattr(serial_port, TCSANOW, &tty) != 0) {
         close(serial_port);
         error_exit("Error setting the serial port attributes");
+    }
+    // Clear input and output buffers
+    if (tcflush(serial_port, TCIOFLUSH) != 0) {
+        error_exit("tcflush");
     }
     return serial_port;
 }

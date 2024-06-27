@@ -1,1 +1,7 @@
 cm.c
+/PC/bin
+/PC/obj
+/Arduino/*.elf
+/Arduino/*.hex
+/Arduino/*.o
+/Arduino/my_uart/*.o
