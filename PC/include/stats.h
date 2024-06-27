@@ -1,5 +1,7 @@
 #pragma once
 #include <stdint.h>
+#include <stdlib.h>
+#include <stdio.h>
 
 #define HOUR_STATS  60
 #define DAY_STATS   24
@@ -21,3 +23,4 @@ extern uint8_t monthIndex;
 // Function declarations
 void clear_statistics(void);
 void query_statistics(void);
+void store_statistics(char *data);

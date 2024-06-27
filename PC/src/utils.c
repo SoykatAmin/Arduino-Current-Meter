@@ -60,12 +60,19 @@ void set_offline_mode(int serial_port) {
     write(serial_port, &command, 1);
 }
 
-void serial_read(int serial_port, char *buffer, int buffer_size){
-    int bytes_read = read(serial_port, buffer, buffer_size);
-    if (bytes_read < 0) {
-        error_exit("Error reading from serial port");
+void* serial_read(void* args){
+    printf("Serial Read Thread Started\n");
+    int serial_port = *(int*)args;
+    char buffer[BUFFER_SIZE];
+    while (online_mode) {
+        memset(buffer, 0, BUFFER_SIZE);
+        int n = read(serial_port, buffer, BUFFER_SIZE - 1);
+        if (n > 0) {
+            store_statistics(buffer);
+            printf("Received: %s\n", buffer);
+        }
     }
-    buffer[bytes_read] = 0;
+    return NULL;
 }
 
 
