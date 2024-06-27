@@ -1,6 +1,7 @@
 #include "sample.h"
 #include <util/delay.h>
 #include <avr/interrupt.h>
+#include <stdlib.h>
 
 volatile uint16_t current_reading = 0;
 
@@ -48,14 +49,22 @@ ISR(TIMER1_COMPA_vect) {
     // Calculate RMS current value
     float rms_current = get_rms();
     // Transmit current reading
+    char buffer[20];
+    sprintf(buffer, "%.2f", rms_current*CALIBRATION_CONST);
     UART_putString("Current reading: ");
-    transmit_current_reading((uint16_t)(rms_current*CALIBRATION_CONST));
+    UART_putString(buffer);
 }
 
 ISR(TIMER2_COMPA_vect) {
     // Read ADC value
     uint16_t adc_value = read_adc();
-    float voltage = adc_value * 5.0 * 0.707 / 1024.0;
+    unsigned char buffer[20];
+    uint16_t actual_value = adc_value - 465;
+    float voltage = adc_value * 5.0 / 1024.0;
     sumOfSquares += voltage * voltage;
+    itoa(actual_value, buffer, 10);
+    UART_putString("adc Value: ");
+    UART_putString(buffer);
+    UART_putString("\n");
     sampleCount++;
 }

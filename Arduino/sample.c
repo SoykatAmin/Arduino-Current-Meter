@@ -9,7 +9,7 @@
 */
 
 volatile long sumOfSquares = 0;
-volatile uint16_t sampleCount = 0;
+volatile int sampleCount = 0;
 
 /**
  * Initializes the ADC (Analog-to-Digital Converter) module.

@@ -12,7 +12,7 @@
     ADC value = 50mV / 5V * 1024 = 10.24
     Calibration constant = 1 / 10.24 = 0.09765625
 */
-#define CALIBRATION_CONST 355.55
+#define CALIBRATION_CONST 0.09765625
 
 /*
     Idea: Use 2 timers. One for sampling every seconds, 
@@ -24,7 +24,7 @@
 */ 
 
 extern volatile long sumOfSquares;
-extern volatile uint16_t sampleCount;
+extern volatile int sampleCount;
 
 // prototypes
 
