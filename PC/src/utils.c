@@ -94,7 +94,7 @@ void* serial_read(void* args){
             }
             int num = isReady(bufferFinal);
             if(num == 126){
-                clear_statistics(serial_port);
+                clear_local_statistics();
                 sendStatistics(bufferFinal);
                 printf("buffer ready\n");
                 memset(bufferFinal, 0, BUFFER_SIZE);

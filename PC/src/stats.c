@@ -16,6 +16,17 @@ void clear_statistics(int fd) {
     sendCommand(fd, "c");
 }
 
+void clear_local_statistics() {
+    memset(hourStats, 0, sizeof(hourStats));
+    memset(dayStats, 0, sizeof(dayStats));
+    memset(monthStats, 0, sizeof(monthStats));
+    memset(yearStats, 0, sizeof(yearStats));
+    minuteIndex = 0;
+    hourIndex = 0;
+    dayIndex = 0;
+    monthIndex = 0;
+}
+
 void query_statistics(int fd) {
     sendCommand(fd, "q");
 }
@@ -23,46 +34,23 @@ void query_statistics(int fd) {
 void store_statistics(char *data){
     uint16_t value = (uint16_t)atoi(data);
     if (value != 0) {
-        printf("Storing data: %s\n", data);
         printf("Storing value: %d\n", value);
     }
     
-    hourStats[minuteIndex++] = value;
-    if (minuteIndex >= HOUR_STATS) {
-        minuteIndex = 0;
-
-        uint16_t hourAvg = 0;
-        for (uint8_t i = 0; i < HOUR_STATS; i++) {
-            hourAvg += hourStats[i];
-        }
-        hourAvg /= HOUR_STATS;
-
-        dayStats[hourIndex++] = hourAvg;
-        if (hourIndex >= DAY_STATS) {
-            hourIndex = 0;
-
-            uint16_t dayAvg = 0;
-            for (uint8_t i = 0; i < DAY_STATS; i++) {
-                dayAvg += dayStats[i];
-            }
-            dayAvg /= DAY_STATS;
-
-            monthStats[dayIndex++] = dayAvg;
-            if (dayIndex >= MONTH_STATS) {
-                dayIndex = 0;
-
-                uint16_t monthAvg = 0;
-                for (uint8_t i = 0; i < MONTH_STATS; i++) {
-                    monthAvg += monthStats[i];
-                }
-                monthAvg /= MONTH_STATS;
-
-                yearStats[monthIndex++] = monthAvg;
-                if (monthIndex >= YEAR_STATS) {
-                    monthIndex = 0;
-                }
+    if(minuteIndex<HOUR_STATS)
+        hourStats[minuteIndex++] = value;
+    else{
+        if(hourIndex<DAY_STATS)
+            dayStats[hourIndex++] = value;
+        else{
+            if(dayIndex<MONTH_STATS)
+                monthStats[dayIndex++] = value;
+            else{
+                if(monthIndex<YEAR_STATS)
+                    yearStats[monthIndex++] = value;
             }
         }
+        
     }
 }
 

@@ -24,5 +24,6 @@ extern uint8_t monthIndex;
 // Function declarations
 void query_statistics(int fd);
 void clear_statistics(int fd);
+void clear_local_statistics();
 void store_statistics(char *data);
 void print_statistics();
