@@ -24,9 +24,10 @@
     every minute and store it in the statistics buffers.
 */ 
 
-extern volatile long sumOfSquares;
-extern volatile int sampleCount;
 extern uint16_t maxValue;
+extern uint16_t minValue;
+extern uint16_t avgCurrent;
+extern uint8_t numSamples;
 
 // prototypes
 

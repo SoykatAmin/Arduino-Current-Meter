@@ -10,9 +10,8 @@
 
 uint16_t maxValue = 0;
 uint16_t minValue = 1024;
-uint16_t sumCurrent = 0;
-uint16_t numSamples = 0;
-
+uint16_t avgCurrent = 0;
+uint8_t numSamples = 0;
 
 /**
  * Initializes the ADC (Analog-to-Digital Converter) module.
@@ -54,20 +53,7 @@ uint16_t read_adc(){
  */
 uint16_t get_volt(void){
     uint16_t result = ((maxValue-minValue) * 5000.0) / 1024.0;
-    UART_putString("Difference: ");
-    char buffer2[20];
-    dtostrf(maxValue - minValue, 0, 5, buffer2);
-    UART_putString(buffer2);
-    UART_putString("\n");
-    if (maxValue - minValue < 30) {
-        sumVoltage += result;
-        count_small_range++;
-        average_voltage = sumVoltage / count_small_range;
-    } else {
-        sumVoltageLargeRange += result;
-        count_large_range++;
-        average_voltage_large_range = sumVoltageLargeRange / count_large_range;
-    }
+
     maxValue = 0; 
     minValue = 1024;
 
@@ -77,16 +63,10 @@ uint16_t get_volt(void){
 uint16_t get_rms(void){
     uint16_t VPP = get_volt();
     uint16_t rms = VPP / (2*sqrt(2));
-    UART_putString("RMS: ");
-    char buffer[20];
-    itoa(rms, buffer, 10);
-    UART_putString(buffer);
-    UART_putString(" mV\n");
     uint16_t currWire = rms * CALIBRATION_CONST;
-    UART_putString("Current: ");
-    itoa(currWire, buffer, 10);
-    UART_putString(buffer);
-    UART_putString(" mA\n");
+    // New average = old average * (n-1)/n + new value /n
+    numSamples++;
+    avgCurrent = (avgCurrent * (numSamples - 1) + currWire) / numSamples;
     return currWire;
 }
 

@@ -1,6 +1,8 @@
 #include "../include/utils.h"
 
 int online_mode = 0;
+char bufferFinal[BUFFER_SIZE];
+int bufferIndex = 0;
 
 void error_exit(const char *message) {
     perror(message);
@@ -68,16 +70,72 @@ void set_offline_mode(int serial_port) {
 void* serial_read(void* args){
     printf("Serial Read Thread Started\n");
     int serial_port = *(int*)args;
+    int temp = 0;
     char buffer[BUFFER_SIZE];
     while (online_mode) {
         memset(buffer, 0, BUFFER_SIZE);
         int n = read(serial_port, buffer, BUFFER_SIZE - 1);
         if (n > 0) {
-            store_statistics(buffer);
-            printf("Received: %s\n", buffer);
+            //store_statistics(buffer);
+            for (int i = 0; i < n; i++) {
+                if (buffer[i] != '\n' || buffer[i] != '\r' || buffer[i] != '\0') {
+                    bufferFinal[bufferIndex] = buffer[i];
+                    bufferIndex++;
+                }
+                if (buffer[i] == '|'){
+                    temp++;
+                }
+                if(temp == 126) {
+                    bufferFinal[bufferIndex] = '\0';
+                    bufferIndex = 0;
+                    temp = 0;
+                    break;
+                }
+            }
+            int num = isReady(bufferFinal);
+            if(num == 126){
+                clear_statistics(serial_port);
+                sendStatistics(bufferFinal);
+                printf("buffer ready\n");
+                memset(bufferFinal, 0, BUFFER_SIZE);
+                bufferIndex = 0;
+            }
         }
+        
     }
     return NULL;
 }
 
+void sendCommand(int fd, const char *command) {
+    write(fd, command, strlen(command));
+}
 
+int isReady(const char* input){
+    char* inputCopy = strdup(input);
+    if (!inputCopy) {
+        error_exit("strdup failed");
+    }
+    char* token = strtok(inputCopy, "|");
+    int num = 0;
+    while (token != NULL) {
+        //processSubstring(token);
+        token = strtok(NULL, "|");
+        num++;
+    }
+
+    free(inputCopy);
+    return num;
+}
+
+void sendStatistics(const char* input){
+    char* inputCopy = strdup(input);
+    if (!inputCopy) {
+        error_exit("strdup failed");
+    }
+    char* token = strtok(inputCopy, "|");
+    while (token != NULL) {
+        store_statistics(token);
+        token = strtok(NULL, "|");
+    }
+    free(inputCopy);
+}

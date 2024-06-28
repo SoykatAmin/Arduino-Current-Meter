@@ -1,10 +1,10 @@
 #include "../include/stats.h"
 
 // Definizione dello storage per le statistiche
-float hourStats[HOUR_STATS];
-float dayStats[DAY_STATS];
-float monthStats[MONTH_STATS];
-float yearStats[YEAR_STATS];
+uint16_t hourStats[HOUR_STATS];
+uint16_t dayStats[DAY_STATS];
+uint16_t monthStats[MONTH_STATS];
+uint16_t yearStats[YEAR_STATS];
 
 // Definizione degli indici per le statistiche
 uint8_t minuteIndex = 0;
@@ -12,51 +12,26 @@ uint8_t hourIndex = 0;
 uint8_t dayIndex = 0;
 uint8_t monthIndex = 0;
 
-void clear_statistics(void) {
-    for (uint8_t i = 0; i < HOUR_STATS; i++) hourStats[i] = 0;
-    for (uint8_t i = 0; i < DAY_STATS; i++) dayStats[i] = 0;
-    for (uint8_t i = 0; i < MONTH_STATS; i++) monthStats[i] = 0;
-    for (uint8_t i = 0; i < YEAR_STATS; i++) yearStats[i] = 0;
-    minuteIndex = hourIndex = dayIndex = monthIndex = 0;
+void clear_statistics(int fd) {
+    sendCommand(fd, "c");
 }
 
-void query_statistics(void) {
-    // Print out hour
-    printf("Hour Stats:\n");
-    for (uint8_t i = 0; i < HOUR_STATS; i++) {
-        // Print out the hour stats
-        printf("%f ", hourStats[i]);
-    }
-    printf("\n");
-    // Print out day
-    printf("Day Stats:\n");
-    for (uint8_t i = 0; i < DAY_STATS; i++) {
-        // Print out the day stats
-        printf("%f ", dayStats[i]);
-    }
-    printf("\n");
-    // Print out month
-    printf("Month Stats:\n");
-    for (uint8_t i = 0; i < MONTH_STATS; i++) {
-        // Print out the month stats
-        printf("%f ", monthStats[i]);
-    }
-    printf("\n");
-    // Print out year
-    printf("Year Stats:\n");
-    for (uint8_t i = 0; i < YEAR_STATS; i++) {
-        // Print out the year stats
-        printf("%f ", yearStats[i]);
-    }
+void query_statistics(int fd) {
+    sendCommand(fd, "q");
 }
 
 void store_statistics(char *data){
-    float value = atof(data);
+    uint16_t value = (uint16_t)atoi(data);
+    if (value != 0) {
+        printf("Storing data: %s\n", data);
+        printf("Storing value: %d\n", value);
+    }
+    
     hourStats[minuteIndex++] = value;
     if (minuteIndex >= HOUR_STATS) {
         minuteIndex = 0;
 
-        float hourAvg = 0;
+        uint16_t hourAvg = 0;
         for (uint8_t i = 0; i < HOUR_STATS; i++) {
             hourAvg += hourStats[i];
         }
@@ -66,7 +41,7 @@ void store_statistics(char *data){
         if (hourIndex >= DAY_STATS) {
             hourIndex = 0;
 
-            float dayAvg = 0;
+            uint16_t dayAvg = 0;
             for (uint8_t i = 0; i < DAY_STATS; i++) {
                 dayAvg += dayStats[i];
             }
@@ -76,7 +51,7 @@ void store_statistics(char *data){
             if (dayIndex >= MONTH_STATS) {
                 dayIndex = 0;
 
-                float monthAvg = 0;
+                uint16_t monthAvg = 0;
                 for (uint8_t i = 0; i < MONTH_STATS; i++) {
                     monthAvg += monthStats[i];
                 }
@@ -89,4 +64,31 @@ void store_statistics(char *data){
             }
         }
     }
+}
+
+void print_statistics(){
+
+    printf("Minute Statistics:\n");
+    for (uint8_t i = 0; i < HOUR_STATS; i++) {
+        printf("%d ", hourStats[i]);
+    }
+    printf("\n");
+
+    printf("Hour Statistics:\n");
+    for (uint8_t i = 0; i < DAY_STATS; i++) {
+        printf("%d ", dayStats[i]);
+    }
+    printf("\n");
+
+    printf("Day Statistics:\n");
+    for (uint8_t i = 0; i < MONTH_STATS; i++) {
+        printf("%d ", monthStats[i]);
+    }
+    printf("\n");
+
+    printf("Month Statistics:\n");
+    for (uint8_t i = 0; i < YEAR_STATS; i++) {
+        printf("%d ", yearStats[i]);
+    }
+    printf("\n");
 }

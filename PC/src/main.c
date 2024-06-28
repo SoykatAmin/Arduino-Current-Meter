@@ -28,11 +28,14 @@ int main(){
                 set_offline_mode(serial_port);
                 break;
             case 'c':
-                clear_statistics();
+                clear_statistics(serial_port);
                 printf("Statistics Cleared\n");
                 break;
             case 'q':
-                query_statistics();
+                query_statistics(serial_port);
+                break;
+            case 'p':
+                print_statistics();
                 break;
             case 'e':
                 open = 0;

@@ -5,11 +5,14 @@
 #include <stdlib.h>
 
 volatile uint16_t current_reading = 0;
+volatile uint8_t sec = 0;
 
 void timer1_init(void);
 void timer2_init(void);
+void timer3_init(void);
 ISR(TIMER1_COMPA_vect);
 ISR(TIMER2_COMPA_vect);
+ISR(USART_RX_vect);
 
 int main(void) {
 
@@ -20,7 +23,20 @@ int main(void) {
     init_adc();
     sei(); // Enable global interrupts
 
-    while (1); //polling
+    while (1){
+        if(sec>=60){
+            //UART_putString("Minute passed\n");
+            UART_putString("Current: ");
+            char buffer[5];
+            itoa(avgCurrent, buffer, 10);
+            UART_putString((uint8_t*)buffer);
+            UART_putString("\n");
+            storeCurrent(avgCurrent);
+            avgCurrent = 0;
+            numSamples = 0;
+            sec = 0;
+        }
+    }
     return 0;
 }
 
@@ -48,7 +64,9 @@ void timer2_init(void) {
 
 ISR(TIMER1_COMPA_vect) {
     // Calculate RMS current value
-    float rms_current = get_rms();
+    //UART_putString("Timer1 \n");
+    sec++;
+    get_rms();
 }
 
 ISR(TIMER2_COMPA_vect) {
@@ -58,6 +76,9 @@ ISR(TIMER2_COMPA_vect) {
 }
 
 // Serial interrupt routine
-ISR(USART_RX_vect) {
-    handleSerial();
+ISR(USART0_RX_vect) {
+    cli();
+    char command = UDR0;
+    handleSerial(command);
+    sei();
 }
