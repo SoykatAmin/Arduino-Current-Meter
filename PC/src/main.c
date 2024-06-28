@@ -17,24 +17,44 @@ int main(){
         fgets(cmd, sizeof(cmd), stdin);
         switch (cmd[0]) {
             case 'o':
-                if(!online_mode){
-                    set_online_mode(serial_port);
-                    if(pthread_create(&thread, NULL, serial_read, (void *)&serial_port)){
-                        error_exit("Error creating thread");
-                    }
+                set_online_mode(serial_port);
+                printf("Select sampling rate (1-255): ");
+                char input[255];
+                fgets(input, sizeof(input), stdin);
+                online_rate = atoi(input);
+                if(online_rate < 1 || online_rate > 255){
+                    printf("Invalid sampling rate\n");
+                    break;
+                }
+                sendCommand(serial_port, input);
+                if(pthread_create(&thread, NULL, serial_read, (void *)&serial_port)){
+                    error_exit("Error creating thread");
                 }
                 break;
             case 'f':
                 set_offline_mode(serial_port);
+                pthread_join(thread, NULL);
                 break;
             case 'c':
+                if(online_mode){
+                    printf("Cannot clear statistics in online mode. Set offline.\n");
+                    break;
+                }
                 clear_statistics(serial_port);
                 printf("Statistics Cleared\n");
                 break;
             case 'q':
+                if(online_mode){
+                    printf("Cannot query statistics in online mode. Set offline.\n");
+                    break;
+                }
                 query_statistics(serial_port);
                 break;
             case 'p':
+                if(online_mode){
+                    printf("Cannot query statistics in online mode. Set offline.\n");
+                    break;
+                }
                 print_statistics();
                 break;
             case 'e':

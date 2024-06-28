@@ -24,17 +24,26 @@ int main(void) {
     sei(); // Enable global interrupts
 
     while (1){
-        if(sec>=60){
-            //UART_putString("Minute passed\n");
-            UART_putString("Current: ");
-            char buffer[5];
-            itoa(avgCurrent, buffer, 10);
-            UART_putString((uint8_t*)buffer);
-            UART_putString("\n");
+        if(sec>=60 && (!online_mode)){
             storeCurrent(avgCurrent);
             avgCurrent = 0;
             numSamples = 0;
             sec = 0;
+        }
+        if(online_rate == 0){
+            UART_putChar('c');
+        }
+        if(online_mode && online_rate != 0){
+            if(sec >= online_rate){
+                char avgCurr[10];
+                itoa(avgCurrent, avgCurr, 10);
+                UART_putString(avgCurr);
+                if(numSamples >= 60){
+                    avgCurrent = 0;
+                    numSamples = 0;
+                }
+                sec = 0;
+            }
         }
     }
     return 0;
@@ -65,8 +74,8 @@ void timer2_init(void) {
 ISR(TIMER1_COMPA_vect) {
     // Calculate RMS current value
     //UART_putString("Timer1 \n");
-    sec++;
     get_rms();
+    sec++;
 }
 
 ISR(TIMER2_COMPA_vect) {

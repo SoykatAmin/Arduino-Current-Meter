@@ -19,6 +19,8 @@ extern volatile uint8_t hourIndex;
 extern volatile uint8_t dayIndex;
 extern volatile uint8_t monthIndex;
 extern volatile uint16_t currentSample;
+extern uint8_t online_mode;
+volatile extern uint8_t online_rate;
 
 // Function Prototypes
 void storeCurrent(uint16_t sample);

@@ -13,6 +13,8 @@ volatile uint8_t dayIndex = 0;
 volatile uint8_t monthIndex = 0;
 volatile uint16_t currentSample = 0;
 volatile uint8_t type = 0;
+uint8_t online_mode = 0;
+volatile uint8_t online_rate = 0;
 
 char buffer[BUFFER_SIZE];
 uint16_t bufferIndex = 0;
@@ -63,11 +65,18 @@ void storeCurrent(uint16_t sample) {
 }
 
 void handleSerial(char command) {
-    
     uint16_t space = 0;
     switch (command) {
         case 'o':  // Set online mode
             // Implementation for online mode
+            online_mode = 1;
+            char temp[10];
+            UART_getString(temp);
+            online_rate = atoi(temp);
+            break;
+        case 'f':  // Set offline mode
+            // Implementation for offline mode
+            online_mode = 0;
             break;
         case 'c':  // Clear statistics
             cli(); // Disable interrupts to safely clear data

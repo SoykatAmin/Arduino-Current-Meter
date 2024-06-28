@@ -17,6 +17,7 @@
 extern int online_mode;
 extern char bufferFinal[];
 extern int bufferIndex;
+extern int online_rate;
 
 int init_serial(const char *port_name);
 void close_serial(int serial_port);

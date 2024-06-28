@@ -13,7 +13,7 @@
     ADC value = 50mV / 5V * 1024 = 10.24
     Calibration constant = 1 / 10.24 = 0.09765625
 */
-#define CALIBRATION_CONST 3.703703704
+#define CALIBRATION_CONST 3.3
 
 /*
     Idea: Use 2 timers. One for sampling every seconds, 

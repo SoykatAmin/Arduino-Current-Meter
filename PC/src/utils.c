@@ -3,6 +3,7 @@
 int online_mode = 0;
 char bufferFinal[BUFFER_SIZE];
 int bufferIndex = 0;
+int online_rate = 0;
 
 void error_exit(const char *message) {
     perror(message);
@@ -71,7 +72,7 @@ void* serial_read(void* args){
     int serial_port = *(int*)args;
     int temp = 0;
     char buffer[BUFFER_SIZE];
-    while (online_mode) {
+    while (!online_mode) {
         memset(buffer, 0, BUFFER_SIZE);
         int n = read(serial_port, buffer, BUFFER_SIZE - 1);
         if (n > 0) {
@@ -99,7 +100,15 @@ void* serial_read(void* args){
                 bufferIndex = 0;
             }
         }
-        
+    }
+    while(online_mode){
+        memset(buffer, 0, BUFFER_SIZE);
+        int n = read(serial_port, buffer, BUFFER_SIZE - 1);
+        if (n > 0) {
+            if(buffer[0] != 'c'){
+                printf("Sample: %s\n", buffer);
+            }
+        }
     }
     return NULL;
 }

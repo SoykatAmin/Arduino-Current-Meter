@@ -63,10 +63,25 @@ uint16_t get_volt(void){
 uint16_t get_rms(void){
     uint16_t VPP = get_volt();
     uint16_t rms = VPP / (2*sqrt(2));
+    /*
+    UART_putString((uint8_t*)"RMS: ");
+    char buffer[5];
+    itoa(rms, buffer, 10);
+    UART_putString((uint8_t*)buffer);
+    UART_putString((uint8_t*)"\n");
+    */
+
     uint16_t currWire = rms * CALIBRATION_CONST;
     // New average = old average * (n-1)/n + new value /n
     numSamples++;
     avgCurrent = (avgCurrent * (numSamples - 1) + currWire) / numSamples;
+    /*
+    UART_putString((uint8_t*)"Current: ");
+    itoa(currWire, buffer, 10);
+    UART_putString((uint8_t*)buffer);
+    UART_putString((uint8_t*)"\n");
+    */
+
     return currWire;
 }
 
