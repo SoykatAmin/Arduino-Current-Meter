@@ -13,7 +13,7 @@ int main(){
     printf("PC Client Initialized\n");
 
     while (open) {
-        printf("Enter command (o=online, f=offline, c=clear, q=query, e=exit): ");
+        printf("Enter command (o=online, f=offline, c=clear, q=query, p=print, e=exit): ");
         fgets(cmd, sizeof(cmd), stdin);
         switch (cmd[0]) {
             case 'o':

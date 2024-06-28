@@ -68,7 +68,6 @@ void set_offline_mode(int serial_port) {
 }
 
 void* serial_read(void* args){
-    printf("Serial Read Thread Started\n");
     int serial_port = *(int*)args;
     int temp = 0;
     char buffer[BUFFER_SIZE];
@@ -96,7 +95,6 @@ void* serial_read(void* args){
             if(num == 126){
                 clear_local_statistics();
                 sendStatistics(bufferFinal);
-                printf("buffer ready\n");
                 memset(bufferFinal, 0, BUFFER_SIZE);
                 bufferIndex = 0;
             }

@@ -33,9 +33,6 @@ void query_statistics(int fd) {
 
 void store_statistics(char *data){
     uint16_t value = (uint16_t)atoi(data);
-    if (value != 0) {
-        printf("Storing value: %d\n", value);
-    }
     
     if(minuteIndex<HOUR_STATS)
         hourStats[minuteIndex++] = value;
