@@ -30,7 +30,9 @@ BINS=main.elf
 # put here the additional .o files you want to generate
 # one .c file for each .o should be present
 OBJS=./my_uart/my_uart.o \
-	sample.o
+	sample.o \
+	utils.o
+
 
 # put here the additional header files needed for compilation
 HEADERS=./my_uart/my_uart.h

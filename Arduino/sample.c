@@ -8,16 +8,10 @@
     We will use the ADC to sample the value every second.
 */
 
-volatile long sumOfSquares = 0;
-volatile int sampleCount = 0;
 uint16_t maxValue = 0;
 uint16_t minValue = 1024;
-int count_small_range = 0;
-int count_large_range = 0;
-float average_voltage = 0.0;
-float sumVoltage = 0.0;
-float average_voltage_large_range = 0.0;
-float sumVoltageLargeRange = 0.0;
+uint16_t sumCurrent = 0;
+uint16_t numSamples = 0;
 
 
 /**
@@ -58,8 +52,8 @@ uint16_t read_adc(){
  * 
  * @return The calculated voltage.
  */
-float get_volt(void){
-    float result = (maxValue * 5.0) / 1024.0;
+uint16_t get_volt(void){
+    uint16_t result = ((maxValue-minValue) * 5000.0) / 1024.0;
     UART_putString("Difference: ");
     char buffer2[20];
     dtostrf(maxValue - minValue, 0, 5, buffer2);
@@ -74,31 +68,25 @@ float get_volt(void){
         count_large_range++;
         average_voltage_large_range = sumVoltageLargeRange / count_large_range;
     }
-    UART_putString("Voltage: ");
-    char buffer[20];
-    dtostrf(result, 0, 5, buffer);
-    UART_putString(buffer);
-    UART_putString(" V\n");
-    UART_putString("Average voltage while not charging: ");
-    dtostrf(average_voltage, 0, 5, buffer);
-    UART_putString(buffer);
-    UART_putString(" V\n");
-    UART_putString("Average voltage while charging: ");
-    dtostrf(average_voltage_large_range, 0, 5, buffer);
-    UART_putString(buffer);
-    UART_putString(" V\n");
-
     maxValue = 0; 
     minValue = 1024;
 
     return result;
 }
 
-float get_rms(void){
-    float VPP = get_volt();
-    float CurrPP = (VPP/200)*1000.0;
-    float rms = CurrPP / sqrt(2);
-    float currWire = rms;
+uint16_t get_rms(void){
+    uint16_t VPP = get_volt();
+    uint16_t rms = VPP / (2*sqrt(2));
+    UART_putString("RMS: ");
+    char buffer[20];
+    itoa(rms, buffer, 10);
+    UART_putString(buffer);
+    UART_putString(" mV\n");
+    uint16_t currWire = rms * CALIBRATION_CONST;
+    UART_putString("Current: ");
+    itoa(currWire, buffer, 10);
+    UART_putString(buffer);
+    UART_putString(" mA\n");
     return currWire;
 }
 

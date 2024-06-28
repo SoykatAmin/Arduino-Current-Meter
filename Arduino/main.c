@@ -1,4 +1,5 @@
 #include "sample.h"
+#include "utils.h"
 #include <util/delay.h>
 #include <avr/interrupt.h>
 #include <stdlib.h>
@@ -48,11 +49,15 @@ void timer2_init(void) {
 ISR(TIMER1_COMPA_vect) {
     // Calculate RMS current value
     float rms_current = get_rms();
-    
 }
 
 ISR(TIMER2_COMPA_vect) {
     // Read ADC value
     uint16_t adc_value = read_adc();
     update_sample(adc_value);
+}
+
+// Serial interrupt routine
+ISR(USART_RX_vect) {
+    handleSerial();
 }

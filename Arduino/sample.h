@@ -13,7 +13,7 @@
     ADC value = 50mV / 5V * 1024 = 10.24
     Calibration constant = 1 / 10.24 = 0.09765625
 */
-#define CALIBRATION_CONST 0.09765625
+#define CALIBRATION_CONST 3.703703704
 
 /*
     Idea: Use 2 timers. One for sampling every seconds, 
@@ -32,7 +32,7 @@ extern uint16_t maxValue;
 
 void init_adc(void);
 uint16_t read_adc();
-float get_volt(void);
-float get_rms(void);
+uint16_t get_volt(void);
+uint16_t get_rms(void);
 void transmit_current_reading(uint16_t current_reading);
 void update_sample(uint16_t sample);
