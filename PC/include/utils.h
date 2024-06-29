@@ -28,3 +28,4 @@ void* serial_read(void* args);
 void sendCommand(int fd, const char *command);
 int isReady(const char* input);
 void sendStatistics(const char* input);
+void serialFlush(int fd);

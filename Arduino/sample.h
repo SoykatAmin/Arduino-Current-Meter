@@ -34,6 +34,6 @@ extern uint8_t numSamples;
 void init_adc(void);
 uint16_t read_adc();
 uint16_t get_volt(void);
-uint16_t get_rms(void);
+uint16_t get_current(void);
 void transmit_current_reading(uint16_t current_reading);
 void update_sample(uint16_t sample);

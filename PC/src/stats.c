@@ -12,10 +12,19 @@ uint8_t hourIndex = 0;
 uint8_t dayIndex = 0;
 uint8_t monthIndex = 0;
 
+
+/**
+ * Sends a clear command to the specified file descriptor.
+ * 
+ * @param fd The file descriptor to send the command to.
+ */
 void clear_statistics(int fd) {
     sendCommand(fd, "c");
 }
 
+/*
+This function clears the local statistics by resetting all the arrays and indices to zero.
+*/
 void clear_local_statistics() {
     memset(hourStats, 0, sizeof(hourStats));
     memset(dayStats, 0, sizeof(dayStats));
@@ -27,10 +36,20 @@ void clear_local_statistics() {
     monthIndex = 0;
 }
 
+/**
+ * Sends a query command to the specified file descriptor.
+ * 
+ * @param fd The file descriptor to send the command to.
+ */
 void query_statistics(int fd) {
     sendCommand(fd, "q");
 }
 
+/**
+ * Stores the statistics data in the appropriate array based on the current index.
+ * 
+ * @param data The data to be stored as statistics.
+ */
 void store_statistics(char *data){
     uint16_t value = (uint16_t)atoi(data);
     
@@ -51,6 +70,10 @@ void store_statistics(char *data){
     }
 }
 
+/**
+ * Prints the statistics for minutes, hours, days, and months.
+ * The statistics are stored in the arrays hourStats, dayStats, monthStats, and yearStats.
+ */
 void print_statistics(){
 
     printf("Minute Statistics:\n");

@@ -4,12 +4,10 @@
 #include <avr/interrupt.h>
 #include <stdlib.h>
 
-volatile uint16_t current_reading = 0;
 volatile uint8_t sec = 0;
 
 void timer1_init(void);
 void timer2_init(void);
-void timer3_init(void);
 ISR(TIMER1_COMPA_vect);
 ISR(TIMER2_COMPA_vect);
 ISR(USART_RX_vect);
@@ -49,6 +47,7 @@ int main(void) {
     return 0;
 }
 
+// Function to initialize Timer1, used update current reading every second
 void timer1_init(void) {
     // Set CTC mode (Clear Timer on Compare Match)
     TCCR1B |= (1 << WGM12);
@@ -60,10 +59,11 @@ void timer1_init(void) {
     TCCR1B |= (1 << CS12) | (1 << CS10);
 }
 
+// Function to initialize Timer2, used to sample at 1000 Hz
 void timer2_init(void) {
     // Set CTC mode (Clear Timer on Compare Match)
     TCCR2A |= (1 << WGM21);
-    // Set compare value for 1 Hz interrupt (assuming 16 MHz clock and 1024 prescaler)
+    // Set compare value for 1000 Hz interrupt (assuming 16 MHz clock and 1024 prescaler)
     OCR2A = 249;
     // Enable Timer2 compare interrupt
     TIMSK2 |= (1 << OCIE2A);
@@ -72,14 +72,11 @@ void timer2_init(void) {
 }
 
 ISR(TIMER1_COMPA_vect) {
-    // Calculate RMS current value
-    //UART_putString("Timer1 \n");
-    get_rms();
+    get_current();
     sec++;
 }
 
 ISR(TIMER2_COMPA_vect) {
-    // Read ADC value
     uint16_t adc_value = read_adc();
     update_sample(adc_value);
 }

@@ -19,6 +19,11 @@ volatile uint8_t online_rate = 0;
 char buffer[BUFFER_SIZE];
 uint16_t bufferIndex = 0;
 
+/**
+ * Stores the current sensor value and updates the data arrays.
+ *
+ * @param sample The current sensor value to be stored.
+ */
 void storeCurrent(uint16_t sample) {
     // Read current sensor value
     currentSample = sample;
@@ -64,6 +69,11 @@ void storeCurrent(uint16_t sample) {
     }
 }
 
+/**
+ * Handles the serial command received from the PC.
+ *
+ * @param command The command character received from the PC.
+ */
 void handleSerial(char command) {
     uint16_t space = 0;
     switch (command) {
@@ -73,10 +83,12 @@ void handleSerial(char command) {
             char temp[10];
             UART_getString(temp);
             online_rate = atoi(temp);
+            uartFlush();
             break;
         case 'f':  // Set offline mode
             // Implementation for offline mode
             online_mode = 0;
+            online_rate = 0;
             break;
         case 'c':  // Clear statistics
             cli(); // Disable interrupts to safely clear data
@@ -121,7 +133,11 @@ void handleSerial(char command) {
     }
 }
 
-// Function to add data to the buffer
+/**
+ * Adds the given data to the buffer.
+ * 
+ * @param data The data to be added to the buffer.
+ */
 void addToBuffer(uint16_t data) {
     char dataBuffer[6];
     itoa(data, dataBuffer, 10);
@@ -141,4 +157,13 @@ void addToBuffer(uint16_t data) {
     
     // Add separator character '|'
     buffer[bufferIndex++] = '|';
+}
+
+/**
+ * Flushes the UART receive buffer by reading and discarding any available data.
+ */
+void uartFlush() {
+    while (UCSR0A & (1 << RXC0)) {
+        char t = UDR0;
+    }
 }

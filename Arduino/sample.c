@@ -9,7 +9,7 @@
 */
 
 uint16_t maxValue = 0;
-uint16_t minValue = 1024;
+uint16_t minValue = 10240;
 uint16_t avgCurrent = 0;
 uint8_t numSamples = 0;
 
@@ -47,7 +47,7 @@ uint16_t read_adc(){
 }
 
 /**
- * Calculates and returns the voltage based on the maximum value obtained from the analog input.
+ * Calculates and returns the voltage based on the maximum and minimum value obtained from the analog input.
  * 
  * @return The calculated voltage.
  */
@@ -60,27 +60,19 @@ uint16_t get_volt(void){
     return result;
 }
 
-uint16_t get_rms(void){
+/**
+ * Calculates and returns the current based on the voltage obtained from the analog input.
+ * 
+ * @return The calculated current.
+ */
+uint16_t get_current(void){
     uint16_t VPP = get_volt();
     uint16_t rms = VPP / (2*sqrt(2));
-    /*
-    UART_putString((uint8_t*)"RMS: ");
-    char buffer[5];
-    itoa(rms, buffer, 10);
-    UART_putString((uint8_t*)buffer);
-    UART_putString((uint8_t*)"\n");
-    */
 
     uint16_t currWire = rms * CALIBRATION_CONST;
     // New average = old average * (n-1)/n + new value /n
     numSamples++;
     avgCurrent = (avgCurrent * (numSamples - 1) + currWire) / numSamples;
-    /*
-    UART_putString((uint8_t*)"Current: ");
-    itoa(currWire, buffer, 10);
-    UART_putString((uint8_t*)buffer);
-    UART_putString((uint8_t*)"\n");
-    */
 
     return currWire;
 }
@@ -91,6 +83,11 @@ void transmit_current_reading(uint16_t current_reading) {
     UART_putString((uint8_t*)buffer);
 }
 
+/**
+ * Updates the sample value and keeps track of the maximum and minimum values.
+ *
+ * @param sample The new sample value to update.
+ */
 void update_sample(uint16_t sample){
     if (sample > maxValue) {
         maxValue = sample;

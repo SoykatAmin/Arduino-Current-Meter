@@ -6,6 +6,7 @@
 
 int main(){
     int serial_port = init_serial(SERIAL_PORT);
+    serialFlush(serial_port);
     char cmd[10];
     int open = 1;
 
@@ -59,7 +60,7 @@ int main(){
                 break;
             case 'e':
                 open = 0;
-                online_mode = 0;
+                set_offline_mode(serial_port);
                 break;
             default:
                 printf("Unknown Command\n");
@@ -68,6 +69,7 @@ int main(){
     }
     
     pthread_join(thread, NULL);
+    serialFlush(serial_port);
     close(serial_port);
     return 0;
 }

@@ -26,3 +26,4 @@ volatile extern uint8_t online_rate;
 void storeCurrent(uint16_t sample);
 void handleSerial(char command);
 void addToBuffer(uint16_t data);
+void uartFlush();

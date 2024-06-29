@@ -5,11 +5,35 @@ char bufferFinal[BUFFER_SIZE];
 int bufferIndex = 0;
 int online_rate = 0;
 
+/**
+ * Prints an error message and exits the program with a failure status.
+ *
+ * @param message The error message to be printed.
+ */
 void error_exit(const char *message) {
     perror(message);
     exit(EXIT_FAILURE);
 }
 
+/**
+ * Flushes the serial input and output buffers.
+ *
+ * This function flushes the input and output buffers of the specified serial port.
+ *
+ * @param fd The file descriptor of the serial port.
+ */
+void serialFlush(int fd) {
+    if(tcflush(fd, TCIFLUSH) != 0) {
+        error_exit("tcflush");
+    }
+}
+
+/**
+ * Initializes the serial port with the specified port name.
+ * 
+ * @param port_name The name of the serial port to initialize.
+ * @return The file descriptor of the opened serial port, or -1 if an error occurred.
+ */
 int init_serial(const char *port_name){
     int serial_port = open(port_name, O_RDWR);
     if (serial_port == -1) {
@@ -21,6 +45,7 @@ int init_serial(const char *port_name){
         error_exit("Error getting the serial port attributes");
     }
 
+    // Configure serial port settings
     tty.c_cflag &= ~PARENB; // No parity
     tty.c_cflag &= ~CSTOPB; // 1 stop bit
     tty.c_cflag &= ~CSIZE; // Clear the size bits
@@ -49,25 +74,43 @@ int init_serial(const char *port_name){
         close(serial_port);
         error_exit("Error setting the serial port attributes");
     }
+    
     // Clear input and output buffers
-    if (tcflush(serial_port, TCIOFLUSH) != 0) {
-        error_exit("tcflush");
-    }
+    serialFlush(serial_port);
+    
     return serial_port;
 }
 
+/**
+ * Sets the online mode for the specified serial port.
+ *
+ * @param serial_port The serial port to set the online mode for.
+ */
 void set_online_mode(int serial_port) {
+    serialFlush(serial_port);
     const char command = 'o';
     online_mode = 1;
     write(serial_port, &command, 1);
 }
 
+/**
+ * Sets the device to offline mode.
+ *
+ * @param serial_port The serial port to communicate with the device.
+ */
 void set_offline_mode(int serial_port) {
+    serialFlush(serial_port);
     const char command = 'f';
     online_mode = 0;
     write(serial_port, &command, 1);
 }
 
+/**
+ * Reads data from a serial port and performs certain operations based on the received data.
+ * 
+ * @param args A pointer to the serial port number.
+ * @return NULL
+ */
 void* serial_read(void* args){
     int serial_port = *(int*)args;
     int temp = 0;
@@ -110,13 +153,26 @@ void* serial_read(void* args){
             }
         }
     }
+    serialFlush(serial_port);
     return NULL;
 }
 
+/**
+ * Sends a command to a file descriptor.
+ *
+ * @param fd The file descriptor to send the command to.
+ * @param command The command to send.
+ */
 void sendCommand(int fd, const char *command) {
     write(fd, command, strlen(command));
 }
 
+/**
+ * Counts the number of substrings separated by '|' in the given input string.
+ *
+ * @param input The input string to be processed.
+ * @return The number of substrings in the input string.
+ */
 int isReady(const char* input){
     char* inputCopy = strdup(input);
     if (!inputCopy) {
@@ -134,6 +190,11 @@ int isReady(const char* input){
     return num;
 }
 
+/**
+ * Sends statistics to be stored.
+ *
+ * @param input The input string containing the statistics.
+ */
 void sendStatistics(const char* input){
     char* inputCopy = strdup(input);
     if (!inputCopy) {
