@@ -27,7 +27,7 @@ int main(void) {
             storeCurrent(temp);
             sec = 0;
         }
-        if(online_rate == 0){
+        if(online_mode && online_rate == 0){
             UART_putChar('c');
         }
         if(online_mode && online_rate != 0){
