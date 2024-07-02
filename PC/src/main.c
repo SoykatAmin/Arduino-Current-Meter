@@ -12,6 +12,11 @@ int main(){
 
     pthread_t thread;
     printf("PC Client Initialized\n");
+    if(!thread_running){
+        if(pthread_create(&thread, NULL, serial_read, (void *)&serial_port)){
+            error_exit("Error creating thread");
+        }
+    }
 
     while (open) {
         printf("Enter command (o=online, f=offline, c=clear, q=query, p=print, e=exit): ");
@@ -28,13 +33,20 @@ int main(){
                     break;
                 }
                 sendCommand(serial_port, input);
-                if(pthread_create(&thread, NULL, serial_read, (void *)&serial_port)){
-                    error_exit("Error creating thread");
+                if(!thread_running){
+                    if(pthread_create(&thread, NULL, serial_read, (void *)&serial_port)){
+                        error_exit("Error creating thread");
+                    }
                 }
+                
                 break;
             case 'f':
                 set_offline_mode(serial_port);
-                pthread_join(thread, NULL);
+                if(!thread_running){
+                    if(pthread_create(&thread, NULL, serial_read, (void *)&serial_port)){
+                        error_exit("Error creating thread");
+                    }
+                }
                 break;
             case 'c':
                 if(online_mode){
@@ -60,6 +72,7 @@ int main(){
                 break;
             case 'e':
                 open = 0;
+                thread_running = 2;
                 set_offline_mode(serial_port);
                 break;
             default:

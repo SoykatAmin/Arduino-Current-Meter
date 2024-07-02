@@ -32,6 +32,8 @@ void storeCurrent(uint16_t sample) {
     itoa(currentSample, dataBuffer, 10);
     UART_putString(dataBuffer);
     UART_putString("\n");
+    numSamples = 0;
+    avgCurrent = 0;
     // Store value in minute data
     minuteData[minuteIndex++] = currentSample;
     if (minuteIndex >= 60) {

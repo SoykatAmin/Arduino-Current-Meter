@@ -55,7 +55,7 @@ uint16_t get_volt(void){
     uint16_t result = ((maxValue-minValue) * 5000.0) / 1024.0;
 
     maxValue = 0; 
-    minValue = 1024;
+    minValue = 10240; 
 
     return result;
 }

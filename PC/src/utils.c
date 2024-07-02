@@ -5,6 +5,8 @@ char bufferFinal[BUFFER_SIZE];
 int bufferIndex = 0;
 int online_rate = 0;
 
+int thread_running = 0;
+
 /**
  * Prints an error message and exits the program with a failure status.
  *
@@ -112,14 +114,18 @@ void set_offline_mode(int serial_port) {
  * @return NULL
  */
 void* serial_read(void* args){
+    thread_running = 1;
     int serial_port = *(int*)args;
     int temp = 0;
     char buffer[BUFFER_SIZE];
     while (!online_mode) {
+        if(thread_running == 2) return NULL;
         memset(buffer, 0, BUFFER_SIZE);
         int n = read(serial_port, buffer, BUFFER_SIZE - 1);
+        //printf("aaaa\n");
         if (n > 0) {
             //store_statistics(buffer);
+            //printf("%s\n", buffer);
             for (int i = 0; i < n; i++) {
                 if (buffer[i] != '\n' || buffer[i] != '\r' || buffer[i] != '\0') {
                     bufferFinal[bufferIndex] = buffer[i];
@@ -145,6 +151,7 @@ void* serial_read(void* args){
         }
     }
     while(online_mode){
+        if(thread_running == 2) return NULL;
         memset(buffer, 0, BUFFER_SIZE);
         int n = read(serial_port, buffer, BUFFER_SIZE - 1);
         if (n > 0) {
@@ -154,6 +161,7 @@ void* serial_read(void* args){
         }
     }
     serialFlush(serial_port);
+    thread_running = 0;
     return NULL;
 }
 

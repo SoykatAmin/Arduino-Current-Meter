@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "./my_uart/my_uart.h"
+#include "sample.h"
 
 #define BUFFER_SIZE 1000
 

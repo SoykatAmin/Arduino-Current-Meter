@@ -22,10 +22,9 @@ int main(void) {
     sei(); // Enable global interrupts
 
     while (1){
-        if(sec>=60 && (!online_mode)){
-            storeCurrent(avgCurrent);
-            avgCurrent = 0;
-            numSamples = 0;
+        if(sec>=60 && !online_mode){
+            uint16_t temp = avgCurrent;
+            storeCurrent(temp);
             sec = 0;
         }
         if(online_rate == 0){

@@ -13,6 +13,7 @@ uint8_t dayIndex = 0;
 uint8_t monthIndex = 0;
 
 
+
 /**
  * Sends a clear command to the specified file descriptor.
  * 
